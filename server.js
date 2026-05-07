@@ -1,11 +1,15 @@
 import express from "express";
 import dotenv from "dotenv";
+import connectDB from "./config/database.js";
 
 dotenv.config();
 
 const app = express();
 
+<<<<<<< David-auth
+=======
 const connectDB = require("./config/database");
+>>>>>>> development
 connectDB();
 
 const PORT = process.env.PORT || 8000;

@@ -1,10 +1,14 @@
 import mongoose from "mongoose";
 
-const Mongo_URI = process.env.Mongo_URI;
-
 const connectDB = async () => {
     try {
-        await mongoose.connect(Mongo_URI);
+        const mongoUri = process.env.MONGODB_URI;
+
+        if (!mongoUri) {
+            throw new Error("MONGODB_URI is not set in the environment.");
+        }
+
+        await mongoose.connect(mongoUri);
         console.log("MongoDB is connected");
     } catch (err) {
         console.error(err.message);
@@ -12,4 +16,4 @@ const connectDB = async () => {
     }
 };
 
-module.exports = connectDB;
+export default connectDB;

@@ -6,6 +6,10 @@ dotenv.config();
 
 const app = express();
 
+<<<<<<< David-auth
+=======
+const connectDB = require("./config/database");
+>>>>>>> development
 connectDB();
 
 const PORT = process.env.PORT || 8000;

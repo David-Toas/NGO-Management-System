@@ -5,7 +5,7 @@ const connectDB = async () => {
     const mongoUri = process.env.MONGODB_URI;
 
     if (!mongoUri) {
-      throw new Error("MongoDB is not set in the environment.");
+      throw new Error("MongoDB is not set in the environment");
     }
 
     await mongoose.connect(mongoUri);

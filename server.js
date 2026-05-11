@@ -1,7 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./config/db.js";
+import connectDB from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config({ path: ".env.local" });
 
@@ -14,6 +15,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 

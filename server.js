@@ -1,19 +1,27 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/database.js";
+import authRoutes from "./routes/authRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
-dotenv.config();
+dotenv.config({ path: ".env.local" });
 
 const app = express();
 
-connectDB();
-
-const PORT = process.env.PORT || 8000;
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Welcome to the NGO Management System! Group 11");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.use("/api/auth", authRoutes);
+
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 8000;
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
 });

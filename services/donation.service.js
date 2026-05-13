@@ -9,6 +9,19 @@ const createError = (message, statusCode) => {
   return error;
 };
 
+const findDonorRecord = async (identifier) => {
+  let donor = await Donor.findById(identifier).populate("user", "name email role");
+
+  if (!donor) {
+    donor = await Donor.findOne({ user: identifier }).populate(
+      "user",
+      "name email role"
+    );
+  }
+
+  return donor;
+};
+
 const generateReference = () => {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -34,9 +47,12 @@ export const createDonation = async (donationData) => {
   const { donorId, projectId, amount, currency, donationType, notes } =
     donationData;
 
-  const donor = await Donor.findById(donorId).populate("user", "name email");
+  const donor = await findDonorRecord(donorId);
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError(
+      "Donor not found for the provided donor profile ID or user ID",
+      404
+    );
   }
 
   if (!donor.isActive) {
@@ -56,7 +72,7 @@ export const createDonation = async (donationData) => {
   }
 
   const donation = await Donation.create({
-    donor: donorId,
+    donor: donor._id,
     project: projectId || null,
     amount: Number(amount),
     currency: (currency || "NGN").toUpperCase(),
@@ -142,9 +158,12 @@ export const getDonationById = async (donationId) => {
 };
 
 export const getDonationsByDonor = async (donorId, { page = 1, limit = 10 }) => {
-  const donor = await Donor.findById(donorId).populate("user", "name email role");
+  const donor = await findDonorRecord(donorId);
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError(
+      "Donor not found for the provided donor profile ID or user ID",
+      404
+    );
   }
 
   const numericPage = Number(page);
@@ -152,12 +171,12 @@ export const getDonationsByDonor = async (donorId, { page = 1, limit = 10 }) => 
   const skip = (numericPage - 1) * numericLimit;
 
   const [donations, total] = await Promise.all([
-    Donation.find({ donor: donorId })
+    Donation.find({ donor: donor._id })
       .populate("project", "title status amountReceived")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(numericLimit),
-    Donation.countDocuments({ donor: donorId }),
+    Donation.countDocuments({ donor: donor._id }),
   ]);
 
   return {

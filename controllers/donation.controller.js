@@ -6,7 +6,7 @@ const canAccessDonor = (authUser, donorUserId) =>
 
 export const createDonation = async (req, res) => {
   try {
-    let donorId = req.body.donorId;
+    let donorId = req.body.donorId || req.body.userId || req.user.id;
 
     if (req.user.role !== "admin") {
       const donor = await donorService.getDonorByUserId(req.user.id);

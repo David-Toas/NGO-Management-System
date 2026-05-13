@@ -8,14 +8,21 @@ const isDonorOwner = (authUser, donor) =>
 
 export const createDonor = async (req, res) => {
   try {
-    const userId = req.user.role === "admin" ? req.body.userId || req.user.id : req.user.id;
+    const { userId, phone, address, donorType, organizationName } = req.body;
+
+    if (req.user.role !== "admin" && userId !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Donors can only create a donor profile for their own user account",
+      });
+    }
 
     const donor = await donorService.createDonor({
       userId,
-      phone: req.body.phone,
-      address: req.body.address,
-      donorType: req.body.donorType,
-      organizationName: req.body.organizationName,
+      phone,
+      address,
+      donorType,
+      organizationName,
     });
 
     return res.status(201).json({

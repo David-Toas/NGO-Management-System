@@ -83,10 +83,11 @@ For protected endpoints, add:
 - Request type: `POST`
 - Payload type: `application/json`
 - Auth: required, admin or donor
-- Note: `userId` is optional and mainly useful for admin. For normal donor use, omit it.
+- Note: `userId` is required. For donor self-service, pass the logged-in user's ID.
 
 ```json
 {
+  "userId": "6822f81b4f0ed1e6455ab456",
   "phone": "+2348012345678",
   "address": "12 Charity Street, Lagos",
   "donorType": "individual"
@@ -97,6 +98,7 @@ Organization example:
 
 ```json
 {
+  "userId": "6822f81b4f0ed1e6455ab456",
   "phone": "+2348012345678",
   "address": "12 Charity Street, Lagos",
   "donorType": "organization",
@@ -122,6 +124,7 @@ Example:
 - Request type: `GET`
 - Payload type: `none`
 - Auth: required, admin or the donor who owns the profile
+- Note: `:id` can be either the donor profile ID or the linked user ID.
 
 Example:
 
@@ -134,6 +137,7 @@ Example:
 - Request type: `PATCH`
 - Payload type: `application/json`
 - Auth: required, admin or the donor who owns the profile
+- Note: `:id` can be either the donor profile ID or the linked user ID.
 
 ```json
 {
@@ -156,6 +160,7 @@ Organization update example:
 - Request type: `PATCH`
 - Payload type: `none`
 - Auth: required, donor who owns the profile only
+- Note: `:id` can be either the donor profile ID or the linked user ID.
 
 Example:
 
@@ -168,6 +173,7 @@ Example:
 - Request type: `PATCH`
 - Payload type: `none`
 - Auth: required, admin only
+- Note: `:id` can be either the donor profile ID or the linked user ID.
 
 Example:
 
@@ -182,7 +188,7 @@ Example:
 - Request type: `POST`
 - Payload type: `application/json`
 - Auth: required, admin or donor
-- Note: `donorId` is optional for donor users, useful for admin.
+- Note: for normal users, the API uses the logged-in user from the token. Admin can optionally pass `userId` or `donorId` to create a donation for a specific donor profile.
 
 ```json
 {
@@ -197,7 +203,7 @@ With donor and project:
 
 ```json
 {
-  "donorId": "6822f81b4f0ed1e6455ab456",
+  "userId": "6822f81b4f0ed1e6455ab456",
   "projectId": "6822f91b4f0ed1e6455ab789",
   "amount": 50000,
   "currency": "NGN",

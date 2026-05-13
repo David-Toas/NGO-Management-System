@@ -4,11 +4,17 @@ import {
   register,
 } from "../controllers/authController.js";
 import protect from "../middleware/authMiddleware.js";
+import { validateChangePassword } from "../middleware/validateChangePassword.js";
 import { validateRegister } from "../middleware/validateRegister.js";
 
 const router = express.Router();
 
 router.post("/register", validateRegister, register);
-router.put("/change-password", protect, changePassword);
+router.put(
+  "/change-password",
+  protect,
+  validateChangePassword,
+  changePassword
+);
 
 export default router;

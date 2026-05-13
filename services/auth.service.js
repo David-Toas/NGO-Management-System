@@ -10,13 +10,17 @@ export const handleChangePassword = async (
   const user = await User.findById(userId).select("+password");
 
   if (!user) {
-    throw new Error("User not found");
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
   }
 
   const isMatch = await bcrypt.compare(currentPassword, user.password);
 
   if (!isMatch) {
-    throw new Error("Current password is incorrect");
+    const error = new Error("Current password is incorrect");
+    error.statusCode = 400;
+    throw error;
   }
 
   user.password = newPassword;

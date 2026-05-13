@@ -7,6 +7,28 @@ const createError = (message, statusCode) => {
   return error;
 };
 
+const findDonorRecord = async (identifier, populateUser = false) => {
+  let query = Donor.findById(identifier);
+
+  if (populateUser) {
+    query = query.populate("user", "name email role");
+  }
+
+  let donor = await query;
+
+  if (!donor) {
+    query = Donor.findOne({ user: identifier });
+
+    if (populateUser) {
+      query = query.populate("user", "name email role");
+    }
+
+    donor = await query;
+  }
+
+  return donor;
+};
+
 export const createDonor = async (donorData) => {
   const { userId, phone, address, donorType, organizationName } = donorData;
 
@@ -75,13 +97,10 @@ export const getAllDonors = async ({
 };
 
 export const getDonorById = async (donorId) => {
-  const donor = await Donor.findById(donorId).populate(
-    "user",
-    "name email role"
-  );
+  const donor = await findDonorRecord(donorId, true);
 
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError("Donor not found for the provided donor ID or user ID", 404);
   }
 
   return donor;
@@ -101,9 +120,9 @@ export const getDonorByUserId = async (userId) => {
 };
 
 export const updateDonor = async (donorId, updateData) => {
-  const donor = await Donor.findById(donorId);
+  const donor = await findDonorRecord(donorId);
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError("Donor not found for the provided donor ID or user ID", 404);
   }
 
   delete updateData.user;
@@ -114,7 +133,7 @@ export const updateDonor = async (donorId, updateData) => {
     updateData.organizationName = undefined;
   }
 
-  const updated = await Donor.findByIdAndUpdate(donorId, updateData, {
+  const updated = await Donor.findByIdAndUpdate(donor._id, updateData, {
     new: true,
     runValidators: true,
   }).populate("user", "name email role");
@@ -123,9 +142,9 @@ export const updateDonor = async (donorId, updateData) => {
 };
 
 export const deactivateDonor = async (donorId) => {
-  const donor = await Donor.findById(donorId);
+  const donor = await findDonorRecord(donorId);
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError("Donor not found for the provided donor ID or user ID", 404);
   }
 
   if (!donor.isActive) {
@@ -139,9 +158,9 @@ export const deactivateDonor = async (donorId) => {
 };
 
 export const reactivateDonor = async (donorId) => {
-  const donor = await Donor.findById(donorId);
+  const donor = await findDonorRecord(donorId);
   if (!donor) {
-    throw createError("Donor not found", 404);
+    throw createError("Donor not found for the provided donor ID or user ID", 404);
   }
 
   if (donor.isActive) {

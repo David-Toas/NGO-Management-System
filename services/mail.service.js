@@ -1,8 +1,11 @@
 import transporter from "../utils/mailer.js";
 
+const mailFrom = process.env.MAIL_FROM || process.env.SMTP_FROM_EMAIL;
+const appBaseUrl = process.env.APP_BASE_URL || process.env.APP_URL;
+
 export const sendWelcomeMail = async ({ name, email }) => {
   const mailOptions = {
-    from: process.env.MAIL_FROM,
+    from: mailFrom,
     to: email,
     subject: "Welcome to Our NGO",
     html: `
@@ -11,14 +14,11 @@ export const sendWelcomeMail = async ({ name, email }) => {
         <p>Thank you for registering with our NGO Management System.</p>
         <p>Your account has been created successfully.
            You can now log in and get started.</p>
-        <a href="${process.env.APP_URL}/login"
+        <a href="${appBaseUrl}/login"
            style="background:#2D6A4F; color:white; padding:10px 20px;
                   text-decoration:none; border-radius:5px;">
           Login to Your Account
         </a>
-        <p style="margin-top:20px; color:#888;">
-          If you did not register, please ignore this email.
-        </p>
       </div>
     `,
   };
@@ -27,10 +27,10 @@ export const sendWelcomeMail = async ({ name, email }) => {
 };
 
 export const sendForgotPasswordMail = async ({ name, email, resetToken }) => {
-  const resetURL = `${process.env.APP_BASE_URL}/reset-password?token=${resetToken}`;
+  const resetURL = `${appBaseUrl}/reset-password?token=${resetToken}`;
 
   const mailOptions = {
-    from: process.env.MAIL_FROM,
+    from: mailFrom,
     to: email,
     subject: "Password Reset Request",
     html: `
@@ -58,15 +58,40 @@ export const sendForgotPasswordMail = async ({ name, email, resetToken }) => {
   await transporter.sendMail(mailOptions);
 };
 
+export const sendPasswordChangedMail = async ({ name, email }) => {
+  const mailOptions = {
+    from: mailFrom,
+    to: email,
+    subject: "Your Password Was Changed",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+        <h2 style="color: #2D6A4F;">Password Changed Successfully</h2>
+        <p>Hi ${name},</p>
+        <p>This is a confirmation that the password for your account was changed successfully.</p>
+        <p>If you made this change, no further action is needed.</p>
+        <p>If you did not change your password, please secure your account immediately and contact support.</p>
+        <a href="${appBaseUrl}/login"
+           style="background:#2D6A4F; color:white; padding:10px 20px;
+                  text-decoration:none; border-radius:5px;">
+          Go to Login
+        </a>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
 export const sendDonationConfirmationMail = async ({
   name,
   email,
   amount,
+  currency,
   projectName,
   reference,
 }) => {
   const mailOptions = {
-    from: process.env.MAIL_FROM,
+    from: mailFrom,
     to: email,
     subject: "Donation Received - Thank You!",
     html: `
@@ -82,7 +107,7 @@ export const sendDonationConfirmationMail = async ({
               <strong>Amount</strong>
             </td>
             <td style="padding:10px; border:1px solid #B7E4C7;">
-              NGN ${amount.toLocaleString()}
+              ${(currency || "NGN").toUpperCase()} ${amount.toLocaleString()}
             </td>
           </tr>
           <tr>

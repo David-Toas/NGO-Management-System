@@ -1,5 +1,9 @@
 import User from "../models/User.js";
 import { handleChangePassword } from "../services/auth.service.js";
+import {
+  sendPasswordChangedMail,
+  sendWelcomeMail,
+} from "../services/mail.service.js";
 import generateToken from "../utils/generateToken.js";
 
 export const register = async (req, res, next) => {
@@ -12,6 +16,15 @@ export const register = async (req, res, next) => {
     }
 
     const user = await User.create({ name, email, password, role });
+
+    try {
+      await sendWelcomeMail({
+        name: user.name,
+        email: user.email,
+      });
+    } catch (mailError) {
+      console.error("Welcome email failed:", mailError.message);
+    }
 
     const token = generateToken(user._id, user.role);
 
@@ -33,7 +46,20 @@ export const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
-    await handleChangePassword(req.user.id, currentPassword, newPassword);
+    const user = await handleChangePassword(
+      req.user.id,
+      currentPassword,
+      newPassword
+    );
+
+    try {
+      await sendPasswordChangedMail({
+        name: user.name,
+        email: user.email,
+      });
+    } catch (mailError) {
+      console.error("Password change email failed:", mailError.message);
+    }
 
     return res.status(200).json({ message: "Password updated successfully" });
   } catch (err) {

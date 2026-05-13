@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run docs:generate && nodemon server.js",
+    "dev": "nodemon server.js",
     "docs:generate": "node \"../NGO Management System API Docs/generate-api-docs.js\"",
     "docs:check": "node \"../NGO Management System API Docs/generate-api-docs.js\" --check"
   },

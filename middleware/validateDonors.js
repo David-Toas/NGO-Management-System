@@ -19,7 +19,8 @@ const handleValidationErrors = (req, res, next) => {
 
 export const validateCreateDonor = [
   body("userId")
-    .optional()
+    .notEmpty()
+    .withMessage("userId is required")
     .isMongoId()
     .withMessage("userId must be a valid ID"),
 
@@ -77,6 +78,11 @@ export const validateCreateDonation = [
     .optional()
     .isMongoId()
     .withMessage("donorId must be a valid ID"),
+
+  body("userId")
+    .optional()
+    .isMongoId()
+    .withMessage("userId must be a valid ID"),
 
   body("amount")
     .notEmpty()

@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import { handleChangePassword } from "../services/auth.service.js";
 import generateToken from "../utils/generateToken.js";
 
 export const register = async (req, res, next) => {
@@ -25,5 +26,17 @@ export const register = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    await handleChangePassword(req.user.id, currentPassword, newPassword);
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    return next(err);
   }
 };

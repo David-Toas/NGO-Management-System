@@ -25,4 +25,6 @@ export const handleChangePassword = async (
 
   user.password = newPassword;
   await user.save();
+
+  return user;
 };

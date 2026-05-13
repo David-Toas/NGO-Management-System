@@ -3,9 +3,9 @@ node_modules/
 
 # Environment variables - NEVER push these
 .env
-# .env.local
-# .env.development
-# .env.production
+.env.local
+.env.development
+.env.production
 
 # Logs
 logs/

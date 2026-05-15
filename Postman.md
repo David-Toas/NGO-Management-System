@@ -58,7 +58,46 @@ For protected endpoints, add:
   "name": "Jane Doe",
   "email": "jane@example.com",
   "password": "Password123",
-  "role": "donor"
+  "role": "public"
+}
+```
+
+Supported roles: `admin`, `staff`, `donor`, `volunteer`, `public`
+
+Default role: `public`
+
+### `POST /api/auth/login`
+
+- Request type: `POST`
+- Payload type: `application/json`
+
+```json
+{
+  "email": "jane@example.com",
+  "password": "Password123"
+}
+```
+
+### `POST /api/auth/forgot-password`
+
+- Request type: `POST`
+- Payload type: `application/json`
+
+```json
+{
+  "email": "jane@example.com"
+}
+```
+
+### `POST /api/auth/reset-password`
+
+- Request type: `POST`
+- Payload type: `application/json`
+
+```json
+{
+  "token": "token-from-reset-email",
+  "newPassword": "NewPassword123"
 }
 ```
 
@@ -82,8 +121,8 @@ For protected endpoints, add:
 
 - Request type: `POST`
 - Payload type: `application/json`
-- Auth: required, admin or donor
-- Note: `userId` is required. For donor self-service, pass the logged-in user's ID.
+- Auth: required, admin, staff, donor, or public
+- Note: `userId` is required. For self-service, pass the logged-in user's ID. Creating a donor profile promotes that user to the `donor` role.
 
 ```json
 {
@@ -110,7 +149,7 @@ Organization example:
 
 - Request type: `GET`
 - Payload type: `none`
-- Auth: required, admin only
+- Auth: required, admin or staff
 - Optional query params: `page`, `limit`, `donorType`, `isActive`
 
 Example:
@@ -123,7 +162,7 @@ Example:
 
 - Request type: `GET`
 - Payload type: `none`
-- Auth: required, admin or the donor who owns the profile
+- Auth: required, admin, staff, or the donor who owns the profile
 - Note: `:id` can be either the donor profile ID or the linked user ID.
 
 Example:
@@ -136,7 +175,7 @@ Example:
 
 - Request type: `PATCH`
 - Payload type: `application/json`
-- Auth: required, admin or the donor who owns the profile
+- Auth: required, admin, staff, or the donor who owns the profile
 - Note: `:id` can be either the donor profile ID or the linked user ID.
 
 ```json
@@ -172,7 +211,7 @@ Example:
 
 - Request type: `PATCH`
 - Payload type: `none`
-- Auth: required, admin only
+- Auth: required, admin or staff
 - Note: `:id` can be either the donor profile ID or the linked user ID.
 
 Example:
@@ -187,8 +226,8 @@ Example:
 
 - Request type: `POST`
 - Payload type: `application/json`
-- Auth: required, admin or donor
-- Note: for normal users, the API uses the logged-in user from the token. Admin can optionally pass `userId` or `donorId` to create a donation for a specific donor profile.
+- Auth: required, admin, staff, or donor
+- Note: donors can only create donations for themselves. Admin and staff can optionally pass `userId` or `donorId` to create a donation for a specific donor profile.
 
 ```json
 {
@@ -216,7 +255,7 @@ With donor and project:
 
 - Request type: `GET`
 - Payload type: `none`
-- Auth: required, admin only
+- Auth: required, admin or staff
 - Optional query params: `page`, `limit`, `status`, `donationType`
 
 Example:
@@ -229,7 +268,7 @@ Example:
 
 - Request type: `GET`
 - Payload type: `none`
-- Auth: required, admin or donor
+- Auth: required, admin, staff, or donor
 - Optional query params: `page`, `limit`
 
 Example:
@@ -242,7 +281,7 @@ Example:
 
 - Request type: `GET`
 - Payload type: `none`
-- Auth: required, admin or donor
+- Auth: required, admin, staff, or donor
 
 Example:
 
@@ -254,7 +293,7 @@ Example:
 
 - Request type: `PATCH`
 - Payload type: `application/json`
-- Auth: required, admin only
+- Auth: required, admin or staff
 
 ```json
 {

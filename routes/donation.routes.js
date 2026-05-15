@@ -20,19 +20,31 @@ router.use(protect);
 
 router
   .route("/")
-  .get(restrictTo("admin"), getAllDonations)
-  .post(restrictTo("admin", "donor"), validateCreateDonation, createDonation);
+  .get(restrictTo("admin", "staff"), getAllDonations)
+  .post(
+    restrictTo("admin", "staff", "donor"),
+    validateCreateDonation,
+    createDonation
+  );
 
 router.get(
   "/donor/:donorId",
-  restrictTo("admin", "donor"),
+  restrictTo("admin", "staff", "donor"),
   validateDonorRouteParam,
   getDonationsByDonor
 );
 
 router
   .route("/:id")
-  .get(restrictTo("admin", "donor"), validateDonationId, getDonationById)
-  .patch(restrictTo("admin"), validateUpdateDonation, updateDonation);
+  .get(
+    restrictTo("admin", "staff", "donor"),
+    validateDonationId,
+    getDonationById
+  )
+  .patch(
+    restrictTo("admin", "staff"),
+    validateUpdateDonation,
+    updateDonation
+  );
 
 export default router;

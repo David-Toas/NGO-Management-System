@@ -1,4 +1,5 @@
 import { body, validationResult } from "express-validator";
+import { ROLES } from "../models/User.js";
 
 export const validateRegister = [
   body("name")
@@ -28,7 +29,7 @@ export const validateRegister = [
 
   body("role")
     .optional()
-    .isIn(["admin", "donor", "volunteer", "beneficiary"])
+    .isIn(ROLES)
     .withMessage("Invalid role"),
 
   (req, res, next) => {

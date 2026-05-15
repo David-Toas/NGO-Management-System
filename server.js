@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import fs from "fs";
+import helmet from "helmet";
+import morgan from "morgan";
 import connectDB, { getDatabaseHealth } from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import donationRoutes from "./routes/donation.routes.js";
@@ -8,6 +10,7 @@ import donorRoutes from "./routes/donor.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
+import logger, { morganStream } from "./utils/logger.js";
 
 dotenv.config({ path: ".env" });
 
@@ -27,6 +30,17 @@ openApiDocument.servers = [
 ];
 
 app.use(express.json());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+app.use(
+  morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
+    stream: morganStream,
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the NGO Management System! Group 11");
@@ -63,6 +77,9 @@ app.use(errorHandler);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    logger.info("Server is running", {
+      port: PORT,
+      url: `http://localhost:${PORT}`,
+    });
   });
 });

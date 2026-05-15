@@ -1,6 +1,7 @@
 import Donation from "../models/Donation.js";
 import Donor from "../models/Donor.js";
 import Project from "../models/Project.js";
+import logger from "../utils/logger.js";
 import { sendDonationConfirmationMail } from "./mail.service.js";
 
 const createError = (message, statusCode) => {
@@ -95,7 +96,12 @@ export const createDonation = async (donationData) => {
       reference: donation.reference,
     });
   } catch (mailError) {
-    console.error("Donation confirmation email failed:", mailError.message);
+    logger.error("Donation confirmation email failed", {
+      donorId: donor._id.toString(),
+      donationId: donation._id.toString(),
+      email: donor.user.email,
+      errorMessage: mailError.message,
+    });
   }
 
   return donation.populate([

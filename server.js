@@ -10,6 +10,7 @@ import donorRoutes from "./routes/donor.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import logger, { morganStream } from "./utils/logger.js";
+import renderApiRootPage from "./utils/renderApiRootPage.js";
 
 dotenv.config({ path: ".env" });
 
@@ -42,7 +43,24 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the NGO Management System! Group 11");
+  const db = getDatabaseHealth();
+  const smtpConfigured = Boolean(
+    process.env.MAIL_HOST ||
+      process.env.SMTP_HOST ||
+      process.env.MAIL_USER ||
+      process.env.SMTP_USER
+  );
+
+  res.type("html").send(
+    renderApiRootPage({
+      port: PORT,
+      env: process.env.NODE_ENV || "development",
+      dbStatus: db.status,
+      smtpConfigured,
+      requestIp: req.ip,
+      uptimeSeconds: Math.floor(process.uptime()),
+    })
+  );
 });
 
 app.get("/api/health", (req, res) => {

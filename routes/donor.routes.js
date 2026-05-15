@@ -20,13 +20,21 @@ router.use(protect);
 
 router
   .route("/")
-  .get(restrictTo("admin"), getAllDonors)
-  .post(restrictTo("admin", "donor"), validateCreateDonor, createDonor);
+  .get(restrictTo("admin", "staff"), getAllDonors)
+  .post(
+    restrictTo("admin", "staff", "donor", "public"),
+    validateCreateDonor,
+    createDonor
+  );
 
 router
   .route("/:id")
-  .get(restrictTo("admin", "donor"), validateDonorId, getDonorById)
-  .patch(restrictTo("admin", "donor"), validateUpdateDonor, updateDonor);
+  .get(restrictTo("admin", "staff", "donor"), validateDonorId, getDonorById)
+  .patch(
+    restrictTo("admin", "staff", "donor"),
+    validateUpdateDonor,
+    updateDonor
+  );
 
 router.patch(
   "/:id/deactivate",
@@ -37,7 +45,7 @@ router.patch(
 
 router.patch(
   "/:id/reactivate",
-  restrictTo("admin"),
+  restrictTo("admin", "staff"),
   validateDonorId,
   reactivateDonor
 );

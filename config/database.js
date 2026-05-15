@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import logger from "../utils/logger.js";
 
 const READY_STATES = {
   0: "disconnected",
@@ -31,22 +32,30 @@ const connectDB = async () => {
 
     if (!listenersRegistered) {
       mongoose.connection.on("error", (error) => {
-        console.error("MongoDB connection error:", error.message);
+        logger.error("MongoDB connection error", {
+          errorMessage: error.message,
+        });
       });
 
       mongoose.connection.on("disconnected", () => {
-        console.warn("MongoDB disconnected");
+        logger.warn("MongoDB disconnected");
       });
 
       listenersRegistered = true;
     }
 
-    console.log("Connecting to MongoDB...");
+    logger.info("Connecting to MongoDB");
     await mongoose.connect(mongoUri);
     const health = getDatabaseHealth();
-    console.log(`MongoDB connected`);
+    logger.info("MongoDB connected", {
+      database: health.database,
+      host: health.host,
+      port: health.port,
+    });
   } catch (err) {
-    console.error(err.message);
+    logger.error("MongoDB startup connection failed", {
+      errorMessage: err.message,
+    });
     process.exit(1);
   }
 };

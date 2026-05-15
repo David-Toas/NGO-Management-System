@@ -1,6 +1,15 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+const upgradeLegacyRole = async (user) => {
+  if (user?.role === "beneficiary") {
+    user.role = "public";
+    await user.save();
+  }
+
+  return user;
+};
+
 const protect = async (req, res, next) => {
   try {
     let token;
@@ -23,7 +32,7 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
-    req.user = user;
+    req.user = await upgradeLegacyRole(user);
     return next();
   } catch (error) {
     return res.status(401).json({ message: "Not authorized, token failed" });

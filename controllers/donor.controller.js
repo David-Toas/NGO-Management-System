@@ -1,7 +1,10 @@
 import * as donorService from "../services/donor.service.js";
 
+const isAdminOrStaff = (authUser) =>
+  authUser.role === "admin" || authUser.role === "staff";
+
 const canAccessDonor = (authUser, donor) =>
-  authUser.role === "admin" || donor.user._id.toString() === authUser.id;
+  isAdminOrStaff(authUser) || donor.user._id.toString() === authUser.id;
 
 const isDonorOwner = (authUser, donor) =>
   donor.user._id.toString() === authUser.id;
@@ -10,10 +13,11 @@ export const createDonor = async (req, res) => {
   try {
     const { userId, phone, address, donorType, organizationName } = req.body;
 
-    if (req.user.role !== "admin" && userId !== req.user.id) {
+    if (!isAdminOrStaff(req.user) && userId !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: "Donors can only create a donor profile for their own user account",
+        message:
+          "You can only create a donor profile for your own user account",
       });
     }
 
@@ -98,7 +102,7 @@ export const updateDonor = async (req, res) => {
       });
     }
 
-    if (!current.isActive && req.user.role !== "admin") {
+    if (!current.isActive && !isAdminOrStaff(req.user)) {
       return res.status(400).json({
         success: false,
         message: "Inactive donors cannot update their profile",

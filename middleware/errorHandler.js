@@ -1,5 +1,13 @@
+import logger from "../utils/logger.js";
+
 const errorHandler = (err, req, res, next) => {
-  console.error(err);
+  logger.error("Unhandled request error", {
+    method: req.method,
+    url: req.originalUrl,
+    errorName: err.name,
+    errorMessage: err.message,
+    stack: err.stack,
+  });
 
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((e) => ({

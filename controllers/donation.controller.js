@@ -1,14 +1,17 @@
 import * as donationService from "../services/donation.service.js";
 import * as donorService from "../services/donor.service.js";
 
+const isAdminOrStaff = (authUser) =>
+  authUser.role === "admin" || authUser.role === "staff";
+
 const canAccessDonor = (authUser, donorUserId) =>
-  authUser.role === "admin" || donorUserId.toString() === authUser.id;
+  isAdminOrStaff(authUser) || donorUserId.toString() === authUser.id;
 
 export const createDonation = async (req, res) => {
   try {
     let donorId = req.body.donorId || req.body.userId || req.user.id;
 
-    if (req.user.role !== "admin") {
+    if (!isAdminOrStaff(req.user)) {
       const donor = await donorService.getDonorByUserId(req.user.id);
       donorId = donor._id;
     }

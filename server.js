@@ -5,6 +5,7 @@ import connectDB, { getDatabaseHealth } from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
+import eventRoutes from "./routes/event.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 
@@ -56,6 +57,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
+app.use("/api/events", eventRoutes);
 
 app.use(errorHandler);
 

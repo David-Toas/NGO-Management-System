@@ -16,18 +16,22 @@ dotenv.config({ path: ".env" });
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const openApiDocumentPath =
-  "C:/Users/Toas/Desktop/NGO Management System API Docs/openapi.json";
-const openApiDocument = JSON.parse(
-  fs.readFileSync(openApiDocumentPath, "utf8")
+const openApiDocumentUrl = new URL(
+  "../NGO Management System API Docs/openapi.json",
+  import.meta.url
 );
+const openApiDocument = fs.existsSync(openApiDocumentUrl)
+  ? JSON.parse(fs.readFileSync(openApiDocumentUrl, "utf8"))
+  : null;
 
-openApiDocument.servers = [
-  {
-    url: `http://localhost:${PORT}`,
-    description: "Local development server",
-  },
-];
+if (openApiDocument) {
+  openApiDocument.servers = [
+    {
+      url: `http://localhost:${PORT}`,
+      description: "Local development server",
+    },
+  ];
+}
 
 app.use(express.json());
 app.use(
@@ -82,9 +86,17 @@ app.get("/api/health/db", (req, res) => {
 });
 
 app.get("/api/docs.json", (req, res) => {
-  res.json(openApiDocument);
+  if (!openApiDocument) {
+    return res.status(404).json({
+      message: "OpenAPI document not found.",
+    });
+  }
+
+  return res.json(openApiDocument);
 });
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
+if (openApiDocument) {
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
+}
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);

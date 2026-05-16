@@ -310,3 +310,179 @@ Failure example:
   "notes": "Payment reconciliation failed"
 }
 ```
+
+## Project Endpoints
+
+### `POST /api/projects`
+
+- Request type: `POST`
+- Payload type: `application/json`
+- Auth: required, admin only
+
+```json
+{
+  "title": "Water Project",
+  "description": "Clean water for rural communities",
+  "budget": 100000,
+  "amountReceived": 50000,
+  "amountSpent": 15000,
+  "status": "ongoing",
+  "startDate": "2026-05-15T00:00:00.000Z",
+  "endDate": "2026-12-31T00:00:00.000Z"
+}
+```
+
+Minimal example:
+
+```json
+{
+  "title": "School Feeding Program",
+  "budget": 50000
+}
+```
+
+Supported statuses:
+
+```text
+planned
+ongoing
+completed
+cancelled
+```
+
+Default status:
+
+```text
+planned
+```
+
+---
+
+### `GET /api/projects`
+
+- Request type: `GET`
+- Payload type: `none`
+- Auth: required
+- Optional query params: `page`, `limit`, `status`
+
+Example:
+
+```text
+/api/projects?page=1&limit=10&status=ongoing
+```
+
+---
+
+### `GET /api/projects/:id`
+
+- Request type: `GET`
+- Payload type: `none`
+- Auth: required
+
+Example:
+
+```text
+/api/projects/6822fa1b4f0ed1e6455ababc
+```
+
+---
+
+### `PATCH /api/projects/:id`
+
+- Request type: `PATCH`
+- Payload type: `application/json`
+- Auth: required, admin only
+
+Example update:
+
+```json
+{
+  "amountSpent": 25000,
+  "status": "ongoing"
+}
+```
+
+Budget update example:
+
+```json
+{
+  "budget": 150000,
+  "amountReceived": 75000
+}
+```
+
+Completion example:
+
+```json
+{
+  "status": "completed",
+  "endDate": "2026-12-31T00:00:00.000Z"
+}
+```
+
+---
+
+### `DELETE /api/projects/:id`
+
+- Request type: `DELETE`
+- Payload type: `none`
+- Auth: required, admin or staff
+
+Example:
+
+```text
+/api/projects/6822fa1b4f0ed1e6455ababc
+```
+
+---
+
+## Project Business Rules
+
+### Budget Tracking
+
+- `amountSpent` cannot exceed `amountReceived`
+- Financial fields must be positive numbers
+- `balance` is automatically calculated as:
+
+```text
+amountReceived - amountSpent
+```
+
+Example:
+
+```json
+{
+  "amountReceived": 50000,
+  "amountSpent": 20000,
+  "balance": 30000
+}
+```
+
+---
+
+## Project Response Example
+
+```json
+{
+  "success": true,
+  "message": "Project retrieved successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababc",
+    "title": "Water Project",
+    "description": "Clean water for rural communities",
+    "budget": 100000,
+    "amountReceived": 50000,
+    "amountSpent": 15000,
+    "status": "ongoing",
+    "balance": 35000,
+    "createdBy": {
+      "_id": "6822f81b4f0ed1e6455ab456",
+      "name": "Admin",
+      "email": "admin@test.com",
+      "role": "admin"
+    },
+    "createdAt": "2026-05-15T02:00:10.415Z",
+    "updatedAt": "2026-05-15T02:00:10.415Z"
+  }
+}
+```

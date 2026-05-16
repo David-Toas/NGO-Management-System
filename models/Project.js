@@ -16,6 +16,13 @@ const projectSchema = new mongoose.Schema(
       required: [true, "Budget is required"],
       min: 0,
     },
+    currency: {
+    type: String,
+    default: "NGN",
+    uppercase: true,
+    trim: true,
+    },
+
     amountReceived: {
       type: Number,
       default: 0,

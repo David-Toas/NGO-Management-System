@@ -11,7 +11,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import logger, { morganStream } from "./utils/logger.js";
 import renderApiRootPage from "./utils/renderApiRootPage.js";
-
+import paymentRoutes from "./routes/payment.js"; 
 dotenv.config({ path: ".env" });
 
 const app = express();
@@ -30,6 +30,7 @@ openApiDocument.servers = [
 ];
 
 app.use(express.json());
+app.use('/api/payment', paymentRoutes);
 app.use(
   helmet({
     contentSecurityPolicy: false,

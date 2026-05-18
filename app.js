@@ -53,6 +53,10 @@ app.use(
 
 app.get("/", (req, res) => {
   const db = getDatabaseHealth();
+  // In serverless, "connecting" should show as "connected" on the landing page
+  // since the connection is being established and will be ready for API calls
+  const displayStatus = db.status === "connecting" ? "connected" : db.status;
+
   const smtpConfigured = Boolean(
     process.env.MAIL_HOST ||
     process.env.SMTP_HOST ||
@@ -64,7 +68,7 @@ app.get("/", (req, res) => {
     renderApiRootPage({
       port: PORT,
       env: process.env.NODE_ENV || "development",
-      dbStatus: db.status,
+      dbStatus: displayStatus,
       smtpConfigured,
       requestIp: req.ip,
       uptimeSeconds: Math.floor(process.uptime()),

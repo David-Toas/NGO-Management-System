@@ -25,11 +25,23 @@ export const getDatabaseHealth = () => {
 
 const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI;
+  const nodeEnv = process.env.NODE_ENV;
+
+  // Debug: Log environment info
+  logger.info("Database connection attempt", {
+    NODE_ENV: nodeEnv,
+    mongoUriExists: !!mongoUri,
+    mongoUriLength: mongoUri?.length || 0,
+    mongoUriStart: mongoUri?.substring(0, 20) || "undefined",
+  });
 
   if (!mongoUri) {
     const error = new Error("MongoDB is not set in the environment");
     logger.error("MongoDB startup connection failed", {
       errorMessage: error.message,
+      availableEnvVars: Object.keys(process.env).filter(
+        (key) => key.includes("MONGO") || key.includes("DB"),
+      ),
     });
     throw error;
   }
@@ -81,6 +93,9 @@ const connectDB = async () => {
     connectionPromise = undefined;
     logger.error("MongoDB startup connection failed", {
       errorMessage: err.message,
+      errorCode: err.code,
+      errorName: err.name,
+      connectionState: mongoose.connection.readyState,
     });
     throw err;
   }

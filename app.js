@@ -4,12 +4,14 @@ import fs from "fs";
 import helmet from "helmet";
 import morgan from "morgan";
 import { getDatabaseHealth } from "./config/database.js";
+import connectDB from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import { morganStream } from "./utils/logger.js";
+import logger from "./utils/logger.js";
 import renderApiRootPage from "./utils/renderApiRootPage.js";
 import paymentRoutes from "./routes/payment.js";
 
@@ -51,12 +53,19 @@ app.use(
   }),
 );
 
-app.get("/", (req, res) => {
-  const db = getDatabaseHealth();
-  // In serverless, "connecting" should show as "connected" on the landing page
-  // since the connection is being established and will be ready for API calls
-  const displayStatus = db.status === "connecting" ? "connected" : db.status;
+app.get("/", async (req, res) => {
+  // Trigger connection attempt if not already connected
+  try {
+    if (getDatabaseHealth().status !== "connected") {
+      await connectDB();
+    }
+  } catch (err) {
+    logger.error("Connection attempt failed on homepage", {
+      errorMessage: err.message,
+    });
+  }
 
+  const db = getDatabaseHealth();
   const smtpConfigured = Boolean(
     process.env.MAIL_HOST ||
     process.env.SMTP_HOST ||
@@ -68,7 +77,7 @@ app.get("/", (req, res) => {
     renderApiRootPage({
       port: PORT,
       env: process.env.NODE_ENV || "development",
-      dbStatus: displayStatus,
+      dbStatus: db.status,
       smtpConfigured,
       requestIp: req.ip,
       uptimeSeconds: Math.floor(process.uptime()),
@@ -76,7 +85,18 @@ app.get("/", (req, res) => {
   );
 });
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", async (req, res) => {
+  // Trigger connection attempt if not already connected
+  try {
+    if (getDatabaseHealth().status !== "connected") {
+      await connectDB();
+    }
+  } catch (err) {
+    logger.error("Connection attempt failed on health check", {
+      errorMessage: err.message,
+    });
+  }
+
   const db = getDatabaseHealth();
   const statusCode = db.status === "connected" ? 200 : 503;
 
@@ -87,10 +107,20 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.get("/api/health/db", (req, res) => {
+app.get("/api/health/db", async (req, res) => {
+  // Trigger connection attempt if not already connected
+  try {
+    if (getDatabaseHealth().status !== "connected") {
+      await connectDB();
+    }
+  } catch (err) {
+    logger.error("Connection attempt failed on db health check", {
+      errorMessage: err.message,
+    });
+  }
+
   const db = getDatabaseHealth();
   const statusCode = db.status === "connected" ? 200 : 503;
-
   res.status(statusCode).json(db);
 });
 

@@ -13,13 +13,16 @@ import { morganStream } from "./utils/logger.js";
 import renderApiRootPage from "./utils/renderApiRootPage.js";
 import paymentRoutes from "./routes/payment.js";
 
-dotenv.config({ path: ".env" });
+// Only load .env in development; Vercel injects vars automatically in production
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env" });
+}
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 const openApiDocumentUrl = new URL(
   "../NGO Management System API Docs/openapi.json",
-  import.meta.url
+  import.meta.url,
 );
 const openApiDocument = fs.existsSync(openApiDocumentUrl)
   ? JSON.parse(fs.readFileSync(openApiDocumentUrl, "utf8"))
@@ -40,21 +43,21 @@ app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
-  })
+  }),
 );
 app.use(
   morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
     stream: morganStream,
-  })
+  }),
 );
 
 app.get("/", (req, res) => {
   const db = getDatabaseHealth();
   const smtpConfigured = Boolean(
     process.env.MAIL_HOST ||
-      process.env.SMTP_HOST ||
-      process.env.MAIL_USER ||
-      process.env.SMTP_USER
+    process.env.SMTP_HOST ||
+    process.env.MAIL_USER ||
+    process.env.SMTP_USER,
   );
 
   res.type("html").send(
@@ -65,7 +68,7 @@ app.get("/", (req, res) => {
       smtpConfigured,
       requestIp: req.ip,
       uptimeSeconds: Math.floor(process.uptime()),
-    })
+    }),
   );
 });
 

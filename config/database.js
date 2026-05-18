@@ -57,16 +57,23 @@ const connectDB = async () => {
   }
 
   logger.info("Connecting to MongoDB");
-  connectionPromise = mongoose.connect(mongoUri).then(() => {
-    const health = getDatabaseHealth();
-    logger.info("MongoDB connected", {
-      database: health.database,
-      host: health.host,
-      port: health.port,
-    });
+  connectionPromise = mongoose
+    .connect(mongoUri, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      minPoolSize: 2,
+    })
+    .then(() => {
+      const health = getDatabaseHealth();
+      logger.info("MongoDB connected", {
+        database: health.database,
+        host: health.host,
+        port: health.port,
+      });
 
-    return mongoose.connection;
-  });
+      return mongoose.connection;
+    });
 
   try {
     return await connectionPromise;

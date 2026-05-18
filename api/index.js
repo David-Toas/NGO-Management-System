@@ -10,6 +10,12 @@ export default async function handler(req, res) {
       errorMessage: error.message,
       stack: error.stack,
     });
+    // Return error response for connection failures
+    return res.status(500).json({
+      status: "error",
+      message: "Database connection failed",
+      error: error.message,
+    });
   }
 
   return app(req, res);

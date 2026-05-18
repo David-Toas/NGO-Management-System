@@ -1,9 +1,10 @@
-import transporter from "../utils/mailer.js";
+import { getTransporter } from "../utils/mailer.js";
 
 const mailFrom = process.env.MAIL_FROM || process.env.SMTP_FROM_EMAIL;
 const appBaseUrl = process.env.APP_BASE_URL || process.env.APP_URL;
 
 export const sendWelcomeMail = async ({ name, email }) => {
+  const transporter = getTransporter();
   const mailOptions = {
     from: mailFrom,
     to: email,
@@ -27,6 +28,7 @@ export const sendWelcomeMail = async ({ name, email }) => {
 };
 
 export const sendForgotPasswordMail = async ({ name, email, resetToken }) => {
+  const transporter = getTransporter();
   const resetURL = `${appBaseUrl}/reset-password?token=${resetToken}`;
 
   const mailOptions = {
@@ -59,6 +61,7 @@ export const sendForgotPasswordMail = async ({ name, email, resetToken }) => {
 };
 
 export const sendPasswordChangedMail = async ({ name, email }) => {
+  const transporter = getTransporter();
   const mailOptions = {
     from: mailFrom,
     to: email,
@@ -90,6 +93,7 @@ export const sendDonationConfirmationMail = async ({
   projectName,
   reference,
 }) => {
+  const transporter = getTransporter();
   const mailOptions = {
     from: mailFrom,
     to: email,

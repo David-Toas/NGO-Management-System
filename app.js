@@ -24,19 +24,30 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const openApiDocumentUrl = new URL(
-  "../NGO Management System API Docs/openapi.json",
-  import.meta.url,
+const openApiDocumentCandidates = [
+  new URL("./docs/openapi.json", import.meta.url),
+  new URL("../NGO Management System API Docs/openapi.json", import.meta.url),
+];
+const openApiDocumentUrl = openApiDocumentCandidates.find((candidate) =>
+  fs.existsSync(candidate),
 );
-const openApiDocument = fs.existsSync(openApiDocumentUrl)
+const openApiDocument = openApiDocumentUrl
   ? JSON.parse(fs.readFileSync(openApiDocumentUrl, "utf8"))
   : null;
 
 if (openApiDocument) {
+  const publicBaseUrl =
+    process.env.PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+    `http://localhost:${PORT}`;
+
   openApiDocument.servers = [
     {
-      url: `http://localhost:${PORT}`,
-      description: "Local development server",
+      url: publicBaseUrl,
+      description:
+        process.env.NODE_ENV === "production"
+          ? "Production server"
+          : "Local development server",
     },
   ];
 }

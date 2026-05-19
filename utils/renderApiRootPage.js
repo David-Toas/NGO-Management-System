@@ -96,6 +96,86 @@ const routeGroups = [
       },
     ],
   },
+  {
+    title: "Projects",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/projects",
+        desc: "List projects",
+        auth: true,
+      },
+      {
+        method: "POST",
+        path: "/api/projects",
+        desc: "Create project",
+        auth: true,
+      },
+      {
+        method: "GET",
+        path: "/api/projects/:id",
+        desc: "View project",
+        auth: true,
+      },
+      {
+        method: "PATCH",
+        path: "/api/projects/:id",
+        desc: "Update project",
+        auth: true,
+      },
+      {
+        method: "DELETE",
+        path: "/api/projects/:id",
+        desc: "Delete project",
+        auth: true,
+      },
+    ],
+  },
+  {
+    title: "Payment",
+    routes: [
+      {
+        method: "POST",
+        path: "/api/payment/initialize",
+        desc: "Initialize Paystack payment",
+      },
+      {
+        method: "GET",
+        path: "/api/payment/verify/:reference",
+        desc: "Verify payment status",
+      },
+      {
+        method: "POST",
+        path: "/api/payment/webhook",
+        desc: "Paystack webhook receiver",
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/reports/donations-summary",
+        desc: "Donations summary",
+      },
+      {
+        method: "GET",
+        path: "/api/reports/projects",
+        desc: "Projects report",
+      },
+      {
+        method: "GET",
+        path: "/api/reports/transparency",
+        desc: "Transparency report",
+      },
+      {
+        method: "GET",
+        path: "/dashboard",
+        desc: "Dashboard metrics",
+      },
+    ],
+  },
 ];
 
 const methodMeta = {
@@ -121,7 +201,7 @@ const renderGroup = (group) => `
   <div class="group-card">
     <div class="group-header">
       <span class="group-icon" aria-hidden="true">
-        ${{ Core: "⬡", Auth: "⬡", Donors: "⬡", Donations: "⬡" }[group.title] || "⬡"}
+        ${{ Core: "⬡", Auth: "🔐", Donors: "👥", Donations: "💰", Projects: "📋", Payment: "💳", Reports: "📊" }[group.title] || "⬡"}
       </span>
       <span class="group-title">${escapeHtml(group.title)}</span>
       <span class="group-count">${group.routes.length} routes</span>

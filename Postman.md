@@ -719,6 +719,118 @@ Example:
 
 ---
 
+## Event Endpoints
+
+### `POST /api/events`
+
+- Request type: `POST`
+- Payload type: `application/json`
+- Auth: required, admin only
+
+```json
+{
+  "title": "Community Outreach Program",
+  "description": "Free health awareness session for local residents",
+  "eventType": "outreach",
+  "location": "12 Unity Hall, Lagos",
+  "date": "2026-06-15T10:00:00.000Z",
+  "project": "6822fa1b4f0ed1e6455ababc",
+  "status": "upcoming"
+}
+```
+
+Minimal example:
+
+```json
+{
+  "title": "Volunteer Training",
+  "date": "2026-06-20T09:00:00.000Z"
+}
+```
+
+Supported event types:
+
+```text
+fundraiser
+outreach
+training
+meeting
+other
+```
+
+Supported statuses:
+
+```text
+upcoming
+ongoing
+completed
+cancelled
+```
+
+### `GET /api/events`
+
+- Request type: `GET`
+- Payload type: `none`
+- Auth: required
+
+Example:
+
+```text
+/api/events
+```
+
+### `GET /api/events/:id`
+
+- Request type: `GET`
+- Payload type: `none`
+- Auth: required
+
+Example:
+
+```text
+/api/events/6822fa1b4f0ed1e6455ababc
+```
+
+### `PUT /api/events/:id`
+
+- Request type: `PUT`
+- Payload type: `application/json`
+- Auth: required, admin only
+
+Example update:
+
+```json
+{
+  "location": "42 Service Road, Abuja",
+  "status": "ongoing"
+}
+```
+
+Attendees update example:
+
+```json
+{
+  "attendees": [
+    "6822f81b4f0ed1e6455ab456",
+    "6822f81b4f0ed1e6455ab789"
+  ]
+}
+```
+
+### `DELETE /api/events/:id`
+
+- Request type: `DELETE`
+- Payload type: `none`
+- Auth: required, admin only
+
+Example:
+
+```text
+/api/events/6822fa1b4f0ed1e6455ababc
+```
+
+---
+
 ## Payment Endpoints
 
 ### `POST /api/payment/initialize`

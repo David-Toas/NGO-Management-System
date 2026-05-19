@@ -10,7 +10,12 @@ import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import projectRoutes from "./routes/project.routes.js";
-import reportRoutes from "./routes/reportroutes.js";
+import {
+  getDashboardMetrics,
+  getDonationsSummary,
+  getProjectsReport,
+  getTransparencyReport,
+} from "./controllers/reportcontroller.js";
 import errorHandler from "./middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import { morganStream } from "./utils/logger.js";
@@ -157,7 +162,10 @@ app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
-app.use("/api/reports", reportRoutes);
+app.get("/api/reports/donations-summary", getDonationsSummary);
+app.get("/api/reports/projects", getProjectsReport);
+app.get("/api/reports/transparency", getTransparencyReport);
+app.get("/api/reports/dashboard", getDashboardMetrics);
 
 app.use(errorHandler);
 

@@ -1,60 +1,58 @@
-
-
 import {
   fetchDonationsSummary,
   fetchProjectsReport,
   fetchTransparencyReport,
-  fetchDashboardMetrics
-} from '../Models/report';
+  fetchDashboardMetrics,
+} from "../models/report.js";
 
-export const getDonationsSummary = (req, res) => {
+export const getDonationsSummary = async (req, res) => {
   try {
-    const data = fetchDonationsSummary();
+    const data = await fetchDonationsSummary();
 
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to generate donations summary',
-      error: error.message
+      message: "Failed to generate donations summary",
+      error: error.message,
     });
   }
 };
 
-export const getProjectsReport = (req, res) => {
+export const getProjectsReport = async (req, res) => {
   try {
-    const data = fetchProjectsReport(req.query);
+    const data = await fetchProjectsReport(req.query);
 
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to generate projects report',
-      error: error.message
+      message: "Failed to generate projects report",
+      error: error.message,
     });
   }
 };
 
-export const getTransparencyReport = (req, res) => {
+export const getTransparencyReport = async (req, res) => {
   try {
-    const data = fetchTransparencyReport();
+    const data = await fetchTransparencyReport();
 
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to generate transparency report',
-      error: error.message
+      message: "Failed to generate transparency report",
+      error: error.message,
     });
   }
 };
 
-export const getDashboardMetrics = (req, res) => {
+export const getDashboardMetrics = async (req, res) => {
   try {
-    const data = fetchDashboardMetrics();
+    const data = await fetchDashboardMetrics();
 
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to load dashboard metrics',
-      error: error.message
+      message: "Failed to load dashboard metrics",
+      error: error.message,
     });
   }
 };

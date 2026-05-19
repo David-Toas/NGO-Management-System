@@ -5,15 +5,15 @@ import {
   getProjectsReport,
   getTransparencyReport,
   getDashboardMetrics,
-} from "../controllers/reportcontroller";
+} from "../controllers/reportcontroller.js";
 
 const router = express.Router();
 
-router.get("/reports/donations-summary", getDonationsSummary);
+router.get("/donations-summary", getDonationsSummary);
 
-router.get("/reports/projects", getProjectsReport);
+router.get("/projects", getProjectsReport);
 
-router.get("/reports/transparency", getTransparencyReport);
+router.get("/transparency", getTransparencyReport);
 
 router.get("/dashboard", getDashboardMetrics);
 

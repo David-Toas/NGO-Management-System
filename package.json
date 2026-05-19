@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "docs:generate": "node \"../NGO Management System API Docs/generate-api-docs.js\"",
-    "docs:check": "node \"../NGO Management System API Docs/generate-api-docs.js\" --check"
+    "docs:sync": "node scripts/sync-openapi-docs.js",
+    "docs:generate": "node \"../NGO Management System API Docs/generate-api-docs.js\" && npm run docs:sync",
+    "docs:check": "node \"../NGO Management System API Docs/generate-api-docs.js\" --check && npm run docs:sync"
   },
   "keywords": [],
   "author": "",

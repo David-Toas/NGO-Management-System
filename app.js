@@ -8,6 +8,7 @@ import connectDB from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
+import eventRoutes from "./routes/event.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import reportRoutes from "./routes/reportroutes.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -24,19 +25,30 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const openApiDocumentUrl = new URL(
-  "../NGO Management System API Docs/openapi.json",
-  import.meta.url,
+const openApiDocumentCandidates = [
+  new URL("./docs/openapi.json", import.meta.url),
+  new URL("../NGO Management System API Docs/openapi.json", import.meta.url),
+];
+const openApiDocumentUrl = openApiDocumentCandidates.find((candidate) =>
+  fs.existsSync(candidate),
 );
-const openApiDocument = fs.existsSync(openApiDocumentUrl)
+const openApiDocument = openApiDocumentUrl
   ? JSON.parse(fs.readFileSync(openApiDocumentUrl, "utf8"))
   : null;
 
 if (openApiDocument) {
+  const publicBaseUrl =
+    process.env.PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+    `http://localhost:${PORT}`;
+
   openApiDocument.servers = [
     {
-      url: `http://localhost:${PORT}`,
-      description: "Local development server",
+      url: publicBaseUrl,
+      description:
+        process.env.NODE_ENV === "production"
+          ? "Production server"
+          : "Local development server",
     },
   ];
 }
@@ -143,6 +155,7 @@ if (openApiDocument) {
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/reports", reportRoutes);
 

@@ -132,6 +132,41 @@ const routeGroups = [
     ],
   },
   {
+    title: "Events",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/events",
+        desc: "List events",
+        auth: true,
+      },
+      {
+        method: "POST",
+        path: "/api/events",
+        desc: "Create event",
+        auth: true,
+      },
+      {
+        method: "GET",
+        path: "/api/events/:id",
+        desc: "View event",
+        auth: true,
+      },
+      {
+        method: "PUT",
+        path: "/api/events/:id",
+        desc: "Update event",
+        auth: true,
+      },
+      {
+        method: "DELETE",
+        path: "/api/events/:id",
+        desc: "Delete event",
+        auth: true,
+      },
+    ],
+  },
+  {
     title: "Payment",
     routes: [
       {

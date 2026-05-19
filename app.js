@@ -8,6 +8,7 @@ import connectDB from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
+import eventRoutes from "./routes/event.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import reportRoutes from "./routes/reportroutes.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -154,6 +155,7 @@ if (openApiDocument) {
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/reports", reportRoutes);
 

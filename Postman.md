@@ -1085,3 +1085,347 @@ Response example:
   }
 }
 ```
+
+## Volunteers
+
+### `GET /api/volunteers`
+
+- Request type: `GET`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "6822fa1b4f0ed1e6455ababc",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com",
+      "phone": "+234701234567",
+      "skills": "Teaching, Coaching",
+      "availability": "Weekends",
+      "status": "approved",
+      "createdAt": "2026-05-19T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### `POST /api/volunteers`
+
+- Request type: `POST`
+- Payload type: `JSON`
+
+Request body:
+
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane@example.com",
+  "phone": "+234701234568",
+  "skills": "Healthcare, Mentoring",
+  "availability": "Weekdays"
+}
+```
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer registered successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababd",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane@example.com",
+    "phone": "+234701234568",
+    "skills": "Healthcare, Mentoring",
+    "availability": "Weekdays",
+    "status": "pending",
+    "createdAt": "2026-05-19T10:30:00.000Z"
+  }
+}
+```
+
+### `GET /api/volunteers/:id`
+
+- Request type: `GET`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababc",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "+234701234567",
+    "skills": "Teaching, Coaching",
+    "availability": "Weekends",
+    "status": "approved",
+    "assignedProjects": ["6822fa1b4f0ed1e6455ababx"],
+    "createdAt": "2026-05-19T10:30:00.000Z"
+  }
+}
+```
+
+### `PATCH /api/volunteers/:id`
+
+- Request type: `PATCH`
+- Payload type: `JSON`
+
+Request body (partial update):
+
+```json
+{
+  "skills": "Teaching, Coaching, Community Service",
+  "availability": "Flexible"
+}
+```
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer updated successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababc",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "+234701234567",
+    "skills": "Teaching, Coaching, Community Service",
+    "availability": "Flexible",
+    "status": "approved"
+  }
+}
+```
+
+### `PATCH /api/volunteers/:id/approve`
+
+- Request type: `PATCH`
+- Payload type: `none`
+- Authorization: Required (JWT)
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer approved successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababd",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "status": "approved"
+  }
+}
+```
+
+### `PATCH /api/volunteers/:id/reject`
+
+- Request type: `PATCH`
+- Payload type: `none`
+- Authorization: Required (JWT)
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer rejected",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababd",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "status": "rejected"
+  }
+}
+```
+
+### `PATCH /api/volunteers/:id/assign`
+
+- Request type: `PATCH`
+- Payload type: `JSON`
+- Authorization: Required (JWT)
+
+Request body:
+
+```json
+{
+  "projectId": "6822fa1b4f0ed1e6455ababx"
+}
+```
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer assigned to project",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababc",
+    "firstName": "John",
+    "lastName": "Doe",
+    "assignedProjects": ["6822fa1b4f0ed1e6455ababx"]
+  }
+}
+```
+
+### `DELETE /api/volunteers/:id`
+
+- Request type: `DELETE`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Volunteer deleted successfully"
+}
+```
+
+## Beneficiaries
+
+### `GET /api/beneficiaries`
+
+- Request type: `GET`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "6822fa1b4f0ed1e6455ababx",
+      "firstName": "Mary",
+      "lastName": "Johnson",
+      "email": "mary@example.com",
+      "phone": "+234701234569",
+      "address": "123 Main Street, Lagos",
+      "caseType": "Education Support",
+      "status": "active",
+      "createdAt": "2026-05-19T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### `POST /api/beneficiaries`
+
+- Request type: `POST`
+- Payload type: `JSON`
+
+Request body:
+
+```json
+{
+  "firstName": "David",
+  "lastName": "Williams",
+  "email": "david@example.com",
+  "phone": "+234701234570",
+  "address": "456 Oak Street, Kano",
+  "caseType": "Health Support"
+}
+```
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Beneficiary registered successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababy",
+    "firstName": "David",
+    "lastName": "Williams",
+    "email": "david@example.com",
+    "phone": "+234701234570",
+    "address": "456 Oak Street, Kano",
+    "caseType": "Health Support",
+    "status": "active",
+    "createdAt": "2026-05-19T10:30:00.000Z"
+  }
+}
+```
+
+### `GET /api/beneficiaries/:id`
+
+- Request type: `GET`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababx",
+    "firstName": "Mary",
+    "lastName": "Johnson",
+    "email": "mary@example.com",
+    "phone": "+234701234569",
+    "address": "123 Main Street, Lagos",
+    "caseType": "Education Support",
+    "status": "active",
+    "supportPrograms": ["6822fa1b4f0ed1e6455abazy"],
+    "createdAt": "2026-05-19T10:30:00.000Z"
+  }
+}
+```
+
+### `PATCH /api/beneficiaries/:id`
+
+- Request type: `PATCH`
+- Payload type: `JSON`
+
+Request body (partial update):
+
+```json
+{
+  "address": "789 Pine Street, Lagos",
+  "status": "inactive"
+}
+```
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Beneficiary updated successfully",
+  "data": {
+    "_id": "6822fa1b4f0ed1e6455ababx",
+    "firstName": "Mary",
+    "lastName": "Johnson",
+    "address": "789 Pine Street, Lagos",
+    "status": "inactive"
+  }
+}
+```
+
+### `DELETE /api/beneficiaries/:id`
+
+- Request type: `DELETE`
+- Payload type: `none`
+
+Response example:
+
+```json
+{
+  "success": true,
+  "message": "Beneficiary deleted successfully"
+}
+```

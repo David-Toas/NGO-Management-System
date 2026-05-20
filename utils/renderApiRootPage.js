@@ -167,6 +167,84 @@ const routeGroups = [
     ],
   },
   {
+    title: "Volunteers",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/volunteers",
+        desc: "List volunteers",
+      },
+      {
+        method: "POST",
+        path: "/api/volunteers",
+        desc: "Register volunteer",
+      },
+      {
+        method: "GET",
+        path: "/api/volunteers/:id",
+        desc: "View volunteer",
+      },
+      {
+        method: "PATCH",
+        path: "/api/volunteers/:id",
+        desc: "Update volunteer",
+      },
+      {
+        method: "PATCH",
+        path: "/api/volunteers/:id/approve",
+        desc: "Approve volunteer",
+        auth: true,
+      },
+      {
+        method: "PATCH",
+        path: "/api/volunteers/:id/reject",
+        desc: "Reject volunteer",
+        auth: true,
+      },
+      {
+        method: "PATCH",
+        path: "/api/volunteers/:id/assign",
+        desc: "Assign to project",
+        auth: true,
+      },
+      {
+        method: "DELETE",
+        path: "/api/volunteers/:id",
+        desc: "Delete volunteer",
+      },
+    ],
+  },
+  {
+    title: "Beneficiaries",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/beneficiaries",
+        desc: "List beneficiaries",
+      },
+      {
+        method: "POST",
+        path: "/api/beneficiaries",
+        desc: "Register beneficiary",
+      },
+      {
+        method: "GET",
+        path: "/api/beneficiaries/:id",
+        desc: "View beneficiary",
+      },
+      {
+        method: "PATCH",
+        path: "/api/beneficiaries/:id",
+        desc: "Update beneficiary",
+      },
+      {
+        method: "DELETE",
+        path: "/api/beneficiaries/:id",
+        desc: "Delete beneficiary",
+      },
+    ],
+  },
+  {
     title: "Payment",
     routes: [
       {
@@ -236,7 +314,7 @@ const renderGroup = (group) => `
   <div class="group-card">
     <div class="group-header">
       <span class="group-icon" aria-hidden="true">
-        ${{ Core: "⬡", Auth: "🔐", Donors: "👥", Donations: "💰", Projects: "📋", Payment: "💳", Reports: "📊" }[group.title] || "⬡"}
+        ${{ Core: "⬡", Auth: "🔐", Donors: "👥", Donations: "💰", Projects: "📋", Events: "📅", Volunteers: "🙋", Beneficiaries: "🤝", Payment: "💳", Reports: "📊" }[group.title] || "⬡"}
       </span>
       <span class="group-title">${escapeHtml(group.title)}</span>
       <span class="group-count">${group.routes.length} routes</span>

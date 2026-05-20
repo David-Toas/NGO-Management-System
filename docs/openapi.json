@@ -44,6 +44,18 @@
       "description": "Project management and tracking"
     },
     {
+      "name": "Events",
+      "description": "Event management and tracking"
+    },
+    {
+      "name": "Volunteers",
+      "description": "Volunteer management and coordination"
+    },
+    {
+      "name": "Beneficiaries",
+      "description": "Beneficiary profile and case management"
+    },
+    {
       "name": "Payment",
       "description": "Payment processing via Paystack"
     },
@@ -1047,6 +1059,421 @@
         "responses": {
           "200": {
             "description": "Project deleted"
+          }
+        }
+      }
+    },
+    "/api/volunteers": {
+      "get": {
+        "tags": ["Volunteers"],
+        "summary": "List All Volunteers",
+        "description": "Get list of all volunteers",
+        "operationId": "getAllVolunteers",
+        "responses": {
+          "200": {
+            "description": "List of volunteers"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Volunteers"],
+        "summary": "Create Volunteer",
+        "description": "Register a new volunteer",
+        "operationId": "createVolunteer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstName", "lastName", "email", "phone"],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "string"
+                  },
+                  "availability": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["pending", "approved", "rejected"],
+                    "default": "pending"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Volunteer created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}": {
+      "get": {
+        "tags": ["Volunteers"],
+        "summary": "Get Volunteer Details",
+        "description": "Retrieve a specific volunteer",
+        "operationId": "getVolunteerById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer retrieved"
+          },
+          "404": {
+            "description": "Volunteer not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Volunteers"],
+        "summary": "Update Volunteer",
+        "description": "Update volunteer information",
+        "operationId": "updateVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "string"
+                  },
+                  "availability": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Volunteer updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Volunteers"],
+        "summary": "Delete Volunteer",
+        "description": "Delete a volunteer",
+        "operationId": "deleteVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer deleted"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/approve": {
+      "patch": {
+        "tags": ["Volunteers"],
+        "summary": "Approve Volunteer",
+        "description": "Approve a pending volunteer",
+        "operationId": "approveVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer approved"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/reject": {
+      "patch": {
+        "tags": ["Volunteers"],
+        "summary": "Reject Volunteer",
+        "description": "Reject a pending volunteer",
+        "operationId": "rejectVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer rejected"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/assign": {
+      "patch": {
+        "tags": ["Volunteers"],
+        "summary": "Assign Volunteer to Project",
+        "description": "Assign a volunteer to a project",
+        "operationId": "assignVolunteerToProject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["projectId"],
+                "properties": {
+                  "projectId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Volunteer assigned to project"
+          }
+        }
+      }
+    },
+    "/api/beneficiaries": {
+      "get": {
+        "tags": ["Beneficiaries"],
+        "summary": "List All Beneficiaries",
+        "description": "Get list of all beneficiaries",
+        "operationId": "getAllBeneficiaries",
+        "responses": {
+          "200": {
+            "description": "List of beneficiaries"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Beneficiaries"],
+        "summary": "Create Beneficiary",
+        "description": "Register a new beneficiary",
+        "operationId": "createBeneficiary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstName", "lastName", "email"],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "Jane"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Smith"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "caseType": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "inactive"],
+                    "default": "active"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Beneficiary created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/beneficiaries/{id}": {
+      "get": {
+        "tags": ["Beneficiaries"],
+        "summary": "Get Beneficiary Details",
+        "description": "Retrieve a specific beneficiary",
+        "operationId": "getBeneficiaryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beneficiary retrieved"
+          },
+          "404": {
+            "description": "Beneficiary not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Beneficiaries"],
+        "summary": "Update Beneficiary",
+        "description": "Update beneficiary information",
+        "operationId": "updateBeneficiary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "caseType": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "inactive"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Beneficiary updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Beneficiaries"],
+        "summary": "Delete Beneficiary",
+        "description": "Delete a beneficiary",
+        "operationId": "deleteBeneficiary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beneficiary deleted"
           }
         }
       }

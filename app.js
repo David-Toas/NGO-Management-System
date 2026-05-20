@@ -46,6 +46,7 @@ if (openApiDocument) {
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
     `http://localhost:${PORT}`;
 
+  // Create a working copy with updated servers
   openApiDocument.servers = [
     {
       url: publicBaseUrl,
@@ -55,6 +56,11 @@ if (openApiDocument) {
           : "Local development server",
     },
   ];
+  
+  logger.info("OpenAPI servers configured", {
+    environment: process.env.NODE_ENV,
+    baseUrl: publicBaseUrl,
+  });
 }
 
 app.use(express.json());
@@ -149,22 +155,25 @@ app.get("/api/docs.json", (req, res) => {
     });
   }
 
+  res.setHeader("Content-Type", "application/json");
   return res.json(openApiDocument);
 });
 
 if (openApiDocument) {
   const swaggerUiOptions = {
     customSiteTitle: "NGO Management System API Docs",
-    swaggerOptions: {
-      url: "/api/docs.json",
-    },
   };
 
   app.use(
     "/api/docs",
-    swaggerUi.serveFiles(null, swaggerUiOptions),
+    swaggerUi.serve,
     swaggerUi.setup(openApiDocument, swaggerUiOptions),
   );
+  
+  logger.info("Swagger UI initialized with OpenAPI document", {
+    paths: Object.keys(openApiDocument.paths || {}).length,
+    servers: openApiDocument.servers || [],
+  });
 }
 
 app.use("/api/auth", authRoutes);

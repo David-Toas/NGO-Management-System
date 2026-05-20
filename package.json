@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "docs:sync": "node scripts/sync-openapi-docs.js",
+    "build-docs": "node -e \"const fs = require('fs'); const json = JSON.parse(fs.readFileSync('docs/openapi.json', 'utf8')); const code = 'export default ' + JSON.stringify(json, null, 2) + ';'; fs.writeFileSync('docs/openapi.js', code); console.log('✓ docs/openapi.js generated');\"",
+    "docs:sync": "node scripts/sync-openapi-docs.js && npm run build-docs",
     "docs:generate": "node \"../NGO Management System API Docs/generate-api-docs.js\" && npm run docs:sync",
     "docs:check": "node \"../NGO Management System API Docs/generate-api-docs.js\" --check && npm run docs:sync"
   },

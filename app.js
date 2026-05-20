@@ -26,6 +26,7 @@ import { morganStream } from "./utils/logger.js";
 import logger from "./utils/logger.js";
 import renderApiRootPage from "./utils/renderApiRootPage.js";
 import paymentRoutes from "./routes/payment.js";
+import openApiDocument from "./docs/openapi.js";
 
 // Only load .env in development; Vercel injects vars automatically in production
 if (process.env.NODE_ENV !== "production") {
@@ -38,33 +39,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Improved OpenAPI document loading with better path resolution
-let openApiDocument = null;
-const openApiDocumentCandidates = [
-  path.join(__dirname, "docs", "openapi.json"),
-  path.join(__dirname, "..", "NGO Management System API Docs", "openapi.json"),
-];
-
-for (const candidatePath of openApiDocumentCandidates) {
-  try {
-    if (fs.existsSync(candidatePath)) {
-      const fileContent = fs.readFileSync(candidatePath, "utf8");
-      openApiDocument = JSON.parse(fileContent);
-      logger.info(`OpenAPI document loaded from: ${candidatePath}`);
-      break;
-    }
-  } catch (error) {
-    logger.warn(
-      `Failed to load OpenAPI document from ${candidatePath}:`,
-      error.message,
-    );
-  }
-}
-
-if (!openApiDocument) {
-  logger.warn("OpenAPI document not found at any candidate path");
-}
-
+// Update OpenAPI servers for the environment
 if (openApiDocument) {
   const publicBaseUrl =
     process.env.PUBLIC_BASE_URL ||

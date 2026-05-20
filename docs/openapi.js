@@ -1,0 +1,2377 @@
+export default {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NGO Management System API",
+    "description": "Comprehensive API for managing NGO operations, donations, donors, projects, and reports.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "NGO Management System Support",
+      "email": "support@ngomanagementsystem.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://ngo-api.example.com",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Core",
+      "description": "Core health and documentation endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints (registration, login, password management)"
+    },
+    {
+      "name": "Donors",
+      "description": "Donor profile management"
+    },
+    {
+      "name": "Donations",
+      "description": "Donation tracking and management"
+    },
+    {
+      "name": "Projects",
+      "description": "Project management and tracking"
+    },
+    {
+      "name": "Events",
+      "description": "Event management and tracking"
+    },
+    {
+      "name": "Volunteers",
+      "description": "Volunteer management and coordination"
+    },
+    {
+      "name": "Beneficiaries",
+      "description": "Beneficiary profile and case management"
+    },
+    {
+      "name": "Payment",
+      "description": "Payment processing via Paystack"
+    },
+    {
+      "name": "Reports",
+      "description": "Financial reports and dashboard metrics"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Core"
+        ],
+        "summary": "API Landing Page",
+        "description": "Returns HTML landing page with API status and available endpoints",
+        "operationId": "getApiRoot",
+        "responses": {
+          "200": {
+            "description": "HTML landing page"
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Core"
+        ],
+        "summary": "Service Health Check",
+        "description": "Returns overall service health status",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "service": {
+                      "type": "string",
+                      "example": "ngo-management-system"
+                    },
+                    "database": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service degraded"
+          }
+        }
+      }
+    },
+    "/api/health/db": {
+      "get": {
+        "tags": [
+          "Core"
+        ],
+        "summary": "Database Health Check",
+        "description": "Returns detailed database connection status",
+        "operationId": "getHealthDb",
+        "responses": {
+          "200": {
+            "description": "Database is connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "connected"
+                    },
+                    "details": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database is not connected"
+          }
+        }
+      }
+    },
+    "/api/docs.json": {
+      "get": {
+        "tags": [
+          "Core"
+        ],
+        "summary": "Get OpenAPI Documentation",
+        "description": "Returns OpenAPI specification in JSON format",
+        "operationId": "getDocsJson",
+        "responses": {
+          "200": {
+            "description": "OpenAPI specification"
+          },
+          "404": {
+            "description": "OpenAPI document not found"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register New User",
+        "description": "Create a new user account",
+        "operationId": "registerUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "jane@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Password123"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "staff",
+                      "donor",
+                      "volunteer",
+                      "public"
+                    ],
+                    "default": "public"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "User Login",
+        "description": "Authenticate user and get JWT token",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "jane@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Request Password Reset",
+        "description": "Send password reset email",
+        "operationId": "forgotPassword",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "jane@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email sent"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Reset Password",
+        "description": "Reset user password with token",
+        "operationId": "resetPassword",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "newPassword"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Reset token from email"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "example": "NewPassword123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Change Password",
+        "description": "Update password for authenticated user",
+        "operationId": "changePassword",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currentPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "currentPassword": {
+                    "type": "string",
+                    "example": "Password123"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "example": "NewPassword123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/donors": {
+      "get": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "List All Donors",
+        "description": "Get paginated list of all donors (admin/staff only)",
+        "operationId": "getAllDonors",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "donorType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "individual",
+                "organization"
+              ]
+            }
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of donors retrieved"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "Create Donor Profile",
+        "description": "Create a new donor profile",
+        "operationId": "createDonor",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "phone",
+                  "address"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "MongoDB user ID"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+2348012345678"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "12 Charity Street, Lagos"
+                  },
+                  "donorType": {
+                    "type": "string",
+                    "enum": [
+                      "individual",
+                      "organization"
+                    ],
+                    "default": "individual"
+                  },
+                  "organizationName": {
+                    "type": "string",
+                    "description": "Required if donorType is organization"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Donor profile created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/donors/{id}": {
+      "get": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "Get Donor Profile",
+        "description": "Retrieve a specific donor's profile",
+        "operationId": "getDonorById",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donor profile retrieved"
+          },
+          "404": {
+            "description": "Donor not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "Update Donor Profile",
+        "description": "Update donor profile information",
+        "operationId": "updateDonor",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "organizationName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Donor profile updated"
+          },
+          "404": {
+            "description": "Donor not found"
+          }
+        }
+      }
+    },
+    "/api/donors/{id}/deactivate": {
+      "patch": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "Deactivate Donor",
+        "description": "Deactivate a donor profile (donor only)",
+        "operationId": "deactivateDonor",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donor deactivated"
+          }
+        }
+      }
+    },
+    "/api/donors/{id}/reactivate": {
+      "patch": {
+        "tags": [
+          "Donors"
+        ],
+        "summary": "Reactivate Donor",
+        "description": "Reactivate a donor profile (admin/staff only)",
+        "operationId": "reactivateDonor",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donor reactivated"
+          }
+        }
+      }
+    },
+    "/api/donations": {
+      "get": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "List All Donations",
+        "description": "Get paginated list of all donations (admin/staff only)",
+        "operationId": "getAllDonations",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "confirmed",
+                "failed"
+              ]
+            }
+          },
+          {
+            "name": "donationType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cash",
+                "transfer",
+                "cheque"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of donations"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "Create Donation",
+        "description": "Record a new donation",
+        "operationId": "createDonation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "projectId": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 25000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "NGN"
+                  },
+                  "donationType": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "transfer",
+                      "cheque"
+                    ],
+                    "default": "transfer"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Donation created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/donations/donor/{donorId}": {
+      "get": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "Get Donations by Donor",
+        "description": "Get all donations from a specific donor",
+        "operationId": "getDonationsByDonor",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "donorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donations retrieved"
+          }
+        }
+      }
+    },
+    "/api/donations/{id}": {
+      "get": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "Get Donation Details",
+        "description": "Retrieve a specific donation",
+        "operationId": "getDonationById",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donation retrieved"
+          },
+          "404": {
+            "description": "Donation not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "Update Donation",
+        "description": "Update donation status and notes (admin/staff only)",
+        "operationId": "updateDonation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "confirmed",
+                      "failed"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Donation updated"
+          }
+        }
+      }
+    },
+    "/api/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "List All Events",
+        "description": "Get list of all events",
+        "operationId": "getAllEvents",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of events retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Event"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Create Event",
+        "description": "Create a new event (admin only)",
+        "operationId": "createEvent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "date"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Community Fundraiser",
+                    "description": "Event title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Event description"
+                  },
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "fundraiser",
+                      "outreach",
+                      "training",
+                      "meeting",
+                      "other"
+                    ],
+                    "default": "other",
+                    "description": "Type of event"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Event location"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2026-06-15T10:00:00Z",
+                    "description": "Event date and time"
+                  },
+                  "project": {
+                    "type": "string",
+                    "description": "Related project ID (optional)"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "upcoming",
+                      "ongoing",
+                      "completed",
+                      "cancelled"
+                    ],
+                    "default": "upcoming"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/events/{id}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get Event Details",
+        "description": "Retrieve a specific event",
+        "operationId": "getEventById",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Event ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Event"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Update Event",
+        "description": "Update event information (admin only)",
+        "operationId": "updateEvent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Event ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "fundraiser",
+                      "outreach",
+                      "training",
+                      "meeting",
+                      "other"
+                    ]
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "project": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "upcoming",
+                      "ongoing",
+                      "completed",
+                      "cancelled"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Delete Event",
+        "description": "Delete an event (admin only)",
+        "operationId": "deleteEvent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Event ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "List All Projects",
+        "description": "Get paginated list of all projects",
+        "operationId": "getAllProjects",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "planned",
+                "ongoing",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of projects"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Create Project",
+        "description": "Create a new project (admin only)",
+        "operationId": "createProject",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Water Project"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "budget": {
+                    "type": "number",
+                    "example": 100000
+                  },
+                  "amountReceived": {
+                    "type": "number",
+                    "default": 0
+                  },
+                  "amountSpent": {
+                    "type": "number",
+                    "default": 0
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "planned",
+                      "ongoing",
+                      "completed",
+                      "cancelled"
+                    ],
+                    "default": "planned"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get Project Details",
+        "description": "Retrieve a specific project",
+        "operationId": "getProjectById",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project retrieved"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Update Project",
+        "description": "Update project information (admin/staff only)",
+        "operationId": "updateProject",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "budget": {
+                    "type": "number"
+                  },
+                  "amountReceived": {
+                    "type": "number"
+                  },
+                  "amountSpent": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "planned",
+                      "ongoing",
+                      "completed",
+                      "cancelled"
+                    ]
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Delete Project",
+        "description": "Delete a project (admin only)",
+        "operationId": "deleteProject",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project deleted"
+          }
+        }
+      }
+    },
+    "/api/volunteers": {
+      "get": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "List All Volunteers",
+        "description": "Get list of all volunteers",
+        "operationId": "getAllVolunteers",
+        "responses": {
+          "200": {
+            "description": "List of volunteers"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Create Volunteer",
+        "description": "Register a new volunteer",
+        "operationId": "createVolunteer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "phone"
+                ],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "string"
+                  },
+                  "availability": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "approved",
+                      "rejected"
+                    ],
+                    "default": "pending"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Volunteer created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}": {
+      "get": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Get Volunteer Details",
+        "description": "Retrieve a specific volunteer",
+        "operationId": "getVolunteerById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer retrieved"
+          },
+          "404": {
+            "description": "Volunteer not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Update Volunteer",
+        "description": "Update volunteer information",
+        "operationId": "updateVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "string"
+                  },
+                  "availability": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Volunteer updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Delete Volunteer",
+        "description": "Delete a volunteer",
+        "operationId": "deleteVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer deleted"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/approve": {
+      "patch": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Approve Volunteer",
+        "description": "Approve a pending volunteer",
+        "operationId": "approveVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer approved"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/reject": {
+      "patch": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Reject Volunteer",
+        "description": "Reject a pending volunteer",
+        "operationId": "rejectVolunteer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer rejected"
+          }
+        }
+      }
+    },
+    "/api/volunteers/{id}/assign": {
+      "patch": {
+        "tags": [
+          "Volunteers"
+        ],
+        "summary": "Assign Volunteer to Project",
+        "description": "Assign a volunteer to a project",
+        "operationId": "assignVolunteerToProject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "projectId"
+                ],
+                "properties": {
+                  "projectId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Volunteer assigned to project"
+          }
+        }
+      }
+    },
+    "/api/beneficiaries": {
+      "get": {
+        "tags": [
+          "Beneficiaries"
+        ],
+        "summary": "List All Beneficiaries",
+        "description": "Get list of all beneficiaries",
+        "operationId": "getAllBeneficiaries",
+        "responses": {
+          "200": {
+            "description": "List of beneficiaries"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Beneficiaries"
+        ],
+        "summary": "Create Beneficiary",
+        "description": "Register a new beneficiary",
+        "operationId": "createBeneficiary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "email"
+                ],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "Jane"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Smith"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "caseType": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive"
+                    ],
+                    "default": "active"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Beneficiary created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/beneficiaries/{id}": {
+      "get": {
+        "tags": [
+          "Beneficiaries"
+        ],
+        "summary": "Get Beneficiary Details",
+        "description": "Retrieve a specific beneficiary",
+        "operationId": "getBeneficiaryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beneficiary retrieved"
+          },
+          "404": {
+            "description": "Beneficiary not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Beneficiaries"
+        ],
+        "summary": "Update Beneficiary",
+        "description": "Update beneficiary information",
+        "operationId": "updateBeneficiary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "caseType": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Beneficiary updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Beneficiaries"
+        ],
+        "summary": "Delete Beneficiary",
+        "description": "Delete a beneficiary",
+        "operationId": "deleteBeneficiary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beneficiary deleted"
+          }
+        }
+      }
+    },
+    "/api/payment/initialize": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Initialize Payment",
+        "description": "Initialize a Paystack payment transaction",
+        "operationId": "initializePayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "amount"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 50000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment initialized"
+          },
+          "500": {
+            "description": "Payment service error"
+          }
+        }
+      }
+    },
+    "/api/payment/verify/{reference}": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Verify Payment",
+        "description": "Verify payment status using reference code",
+        "operationId": "verifyPayment",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment status retrieved"
+          },
+          "500": {
+            "description": "Payment service error"
+          }
+        }
+      }
+    },
+    "/api/payment/webhook": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Paystack Webhook",
+        "description": "Receive payment confirmations from Paystack",
+        "operationId": "paymentWebhook",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed"
+          }
+        }
+      }
+    },
+    "/api/reports/donations-summary": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Donations Summary",
+        "description": "Get summary statistics of all donations",
+        "operationId": "getDonationsSummary",
+        "responses": {
+          "200": {
+            "description": "Donations summary retrieved"
+          }
+        }
+      }
+    },
+    "/api/reports/projects": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Projects Report",
+        "description": "Get detailed projects report",
+        "operationId": "getProjectsReport",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projects report retrieved"
+          }
+        }
+      }
+    },
+    "/api/reports/transparency": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Transparency Report",
+        "description": "Get financial transparency report",
+        "operationId": "getTransparencyReport",
+        "responses": {
+          "200": {
+            "description": "Transparency report retrieved"
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Dashboard Metrics",
+        "description": "Get comprehensive dashboard metrics",
+        "operationId": "getDashboardMetrics",
+        "responses": {
+          "200": {
+            "description": "Dashboard metrics retrieved"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token obtained from /api/auth/login"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "staff",
+              "donor",
+              "volunteer",
+              "public"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Donor": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "donorType": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "organization"
+            ]
+          },
+          "organizationName": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Donation": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "donorId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "donationType": {
+            "type": "string",
+            "enum": [
+              "cash",
+              "transfer",
+              "cheque"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "failed"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "number"
+          },
+          "amountReceived": {
+            "type": "number"
+          },
+          "amountSpent": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "ongoing",
+              "completed",
+              "cancelled"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Event title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Event description"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "fundraiser",
+              "outreach",
+              "training",
+              "meeting",
+              "other"
+            ],
+            "description": "Type of event"
+          },
+          "location": {
+            "type": "string",
+            "description": "Event location"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event date and time"
+          },
+          "project": {
+            "type": "object",
+            "description": "Related project reference",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          },
+          "organizer": {
+            "type": "object",
+            "description": "Event organizer reference",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            }
+          },
+          "attendees": {
+            "type": "array",
+            "description": "List of attendee references",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "upcoming",
+              "ongoing",
+              "completed",
+              "cancelled"
+            ],
+            "description": "Event status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+};

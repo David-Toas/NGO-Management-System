@@ -188,7 +188,7 @@ if (openApiDocument) {
   app.use(
     "/api/docs",
     swaggerUi.serveFiles(null, swaggerUiOptions),
-    swaggerUi.setup(null, swaggerUiOptions),
+    swaggerUi.setup(openApiDocument, swaggerUiOptions),
   );
 }
 

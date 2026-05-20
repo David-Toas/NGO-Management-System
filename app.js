@@ -56,7 +56,7 @@ if (openApiDocument) {
           : "Local development server",
     },
   ];
-  
+
   logger.info("OpenAPI servers configured", {
     environment: process.env.NODE_ENV,
     baseUrl: publicBaseUrl,
@@ -169,7 +169,7 @@ if (openApiDocument) {
     swaggerUi.serve,
     swaggerUi.setup(openApiDocument, swaggerUiOptions),
   );
-  
+
   logger.info("Swagger UI initialized with OpenAPI document", {
     paths: Object.keys(openApiDocument.paths || {}).length,
     servers: openApiDocument.servers || [],

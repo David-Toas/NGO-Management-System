@@ -178,7 +178,18 @@ app.get("/api/docs.json", (req, res) => {
 });
 
 if (openApiDocument) {
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
+  const swaggerUiOptions = {
+    customSiteTitle: "NGO Management System API Docs",
+    swaggerOptions: {
+      url: "/api/docs.json",
+    },
+  };
+
+  app.use(
+    "/api/docs",
+    swaggerUi.serveFiles(null, swaggerUiOptions),
+    swaggerUi.setup(null, swaggerUiOptions),
+  );
 }
 
 app.use("/api/auth", authRoutes);

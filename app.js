@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import helmet from "helmet";
 import morgan from "morgan";
 import { getDatabaseHealth } from "./config/database.js";
@@ -10,6 +12,8 @@ import donationRoutes from "./routes/donation.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import projectRoutes from "./routes/project.routes.js";
+import volunteerRoutes from "./routes/volunteer.js";
+import beneficiaryRoutes from "./routes/beneficiary.js";
 import {
   getDashboardMetrics,
   getDonationsSummary,
@@ -28,18 +32,38 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" });
 }
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 8000;
+
+// Improved OpenAPI document loading with better path resolution
+let openApiDocument = null;
 const openApiDocumentCandidates = [
-  new URL("./docs/openapi.json", import.meta.url),
-  new URL("../NGO Management System API Docs/openapi.json", import.meta.url),
+  path.join(__dirname, "docs", "openapi.json"),
+  path.join(__dirname, "..", "NGO Management System API Docs", "openapi.json"),
 ];
-const openApiDocumentUrl = openApiDocumentCandidates.find((candidate) =>
-  fs.existsSync(candidate),
-);
-const openApiDocument = openApiDocumentUrl
-  ? JSON.parse(fs.readFileSync(openApiDocumentUrl, "utf8"))
-  : null;
+
+for (const candidatePath of openApiDocumentCandidates) {
+  try {
+    if (fs.existsSync(candidatePath)) {
+      const fileContent = fs.readFileSync(candidatePath, "utf8");
+      openApiDocument = JSON.parse(fileContent);
+      logger.info(`OpenAPI document loaded from: ${candidatePath}`);
+      break;
+    }
+  } catch (error) {
+    logger.warn(
+      `Failed to load OpenAPI document from ${candidatePath}:`,
+      error.message,
+    );
+  }
+}
+
+if (!openApiDocument) {
+  logger.warn("OpenAPI document not found at any candidate path");
+}
 
 if (openApiDocument) {
   const publicBaseUrl =
@@ -162,6 +186,8 @@ app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/volunteers", volunteerRoutes);
+app.use("/api/beneficiaries", beneficiaryRoutes);
 app.get("/api/reports/donations-summary", getDonationsSummary);
 app.get("/api/reports/projects", getProjectsReport);
 app.get("/api/reports/transparency", getTransparencyReport);

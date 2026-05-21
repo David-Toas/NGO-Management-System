@@ -67,7 +67,20 @@ app.use(express.json());
 app.use("/api/payment", paymentRoutes);
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
+        styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
+        imgSrc: ["'self'", "data:", "https:"],
+        fontSrc: [
+          "'self'",
+          "data:",
+          "fonts.googleapis.com",
+          "fonts.gstatic.com",
+        ],
+      },
+    },
     crossOriginEmbedderPolicy: false,
   }),
 );
@@ -150,18 +163,26 @@ app.get("/api/health/db", async (req, res) => {
 
 app.get("/api/docs.json", (req, res) => {
   if (!openApiDocument) {
+    logger.error("OpenAPI document not found on /api/docs.json");
     return res.status(404).json({
       message: "OpenAPI document not found.",
     });
   }
 
   res.setHeader("Content-Type", "application/json");
+  logger.debug("Serving OpenAPI document", {
+    pathsCount: Object.keys(openApiDocument.paths || {}).length,
+  });
   return res.json(openApiDocument);
 });
 
 if (openApiDocument) {
   const swaggerUiOptions = {
     customSiteTitle: "NGO Management System API Docs",
+    customCss: ".swagger-ui { max-width: none; }",
+    deepLinking: true,
+    filter: true,
+    layout: "BaseLayout",
   };
 
   app.use(

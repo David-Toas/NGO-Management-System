@@ -20,7 +20,6 @@ import {
   getTransparencyReport,
 } from "./controllers/reportcontroller.js";
 import errorHandler from "./middleware/errorHandler.js";
-import swaggerUi from "swagger-ui-express";
 import { morganStream } from "./utils/logger.js";
 import logger from "./utils/logger.js";
 import renderApiRootPage from "./utils/renderApiRootPage.js";
@@ -38,7 +37,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Update OpenAPI servers for the environment
+// ─── Update OpenAPI servers for the environment ───────────────────────────────
 if (openApiDocument) {
   const publicBaseUrl =
     process.env.PUBLIC_BASE_URL ||
@@ -73,7 +72,7 @@ app.use(
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
-          "'unsafe-eval'", // required for Swagger UI in production
+          "'unsafe-eval'",
           "cdn.jsdelivr.net",
         ],
         styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
@@ -83,9 +82,9 @@ app.use(
           "data:",
           "fonts.googleapis.com",
           "fonts.gstatic.com",
-          "cdn.jsdelivr.net", // swagger fonts
+          "cdn.jsdelivr.net",
         ],
-        workerSrc: ["'self'", "blob:"], // swagger uses blob workers
+        workerSrc: ["'self'", "blob:"],
       },
     },
     crossOriginEmbedderPolicy: false,
@@ -186,25 +185,51 @@ app.get("/api/docs.json", (req, res) => {
   return res.json(openApiDocument);
 });
 
-// ─── Swagger UI ───────────────────────────────────────────────────────────────
+// ─── Swagger UI — CDN approach (works reliably on Vercel) ────────────────────
 if (openApiDocument) {
-  const swaggerUiOptions = {
-    customSiteTitle: "NGO Management System API Docs",
-    customCss: ".swagger-ui { max-width: none; }",
-    deepLinking: true,
-    filter: true,
-    layout: "BaseLayout",
-  };
+  app.get("/api/docs", (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NGO Management System API Docs</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+        <style>
+          body { margin: 0; padding: 0; }
+          .swagger-ui .topbar { background-color: #2D6A4F; }
+          .swagger-ui .topbar .download-url-wrapper { display: none; }
+        </style>
+      </head>
+      <body>
+        <div id="swagger-ui"></div>
+        <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+        <script>
+          window.onload = function () {
+            SwaggerUIBundle({
+              url: "/api/docs.json",
+              dom_id: "#swagger-ui",
+              presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+              ],
+              plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+              layout: "StandaloneLayout",
+              deepLinking: true,
+              filter: true,
+              tryItOutEnabled: true,
+            });
+          };
+        </script>
+      </body>
+      </html>
+    `);
+  });
 
-  app.use(
-    "/api/docs",
-    swaggerUi.serve,
-    swaggerUi.setup(openApiDocument, swaggerUiOptions),
-  );
-
-  logger.info("Swagger UI initialized with OpenAPI document", {
+  logger.info("Swagger UI initialized via CDN", {
     paths: Object.keys(openApiDocument.paths || {}).length,
-    servers: openApiDocument.servers || [],
   });
 }
 
@@ -223,6 +248,7 @@ app.get("/api/reports/projects", getProjectsReport);
 app.get("/api/reports/transparency", getTransparencyReport);
 app.get("/api/reports/dashboard", getDashboardMetrics);
 
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(errorHandler);
 
 export default app;

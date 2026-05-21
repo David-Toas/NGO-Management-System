@@ -1,6 +1,5 @@
 import express from "express";
 import dotenv from "dotenv";
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import helmet from "helmet";
@@ -46,7 +45,6 @@ if (openApiDocument) {
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
     `http://localhost:${PORT}`;
 
-  // Create a working copy with updated servers
   openApiDocument.servers = [
     {
       url: publicBaseUrl,
@@ -65,12 +63,19 @@ if (openApiDocument) {
 
 app.use(express.json());
 app.use("/api/payment", paymentRoutes);
+
+// ─── Helmet — Security Headers ────────────────────────────────────────────────
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'", // required for Swagger UI in production
+          "cdn.jsdelivr.net",
+        ],
         styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
         imgSrc: ["'self'", "data:", "https:"],
         fontSrc: [
@@ -78,20 +83,24 @@ app.use(
           "data:",
           "fonts.googleapis.com",
           "fonts.gstatic.com",
+          "cdn.jsdelivr.net", // swagger fonts
         ],
+        workerSrc: ["'self'", "blob:"], // swagger uses blob workers
       },
     },
     crossOriginEmbedderPolicy: false,
   }),
 );
+
+// ─── Morgan — Request Logging ─────────────────────────────────────────────────
 app.use(
   morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
     stream: morganStream,
   }),
 );
 
+// ─── Root Page ────────────────────────────────────────────────────────────────
 app.get("/", async (req, res) => {
-  // Trigger connection attempt if not already connected
   try {
     if (getDatabaseHealth().status !== "connected") {
       await connectDB();
@@ -122,8 +131,8 @@ app.get("/", async (req, res) => {
   );
 });
 
+// ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/api/health", async (req, res) => {
-  // Trigger connection attempt if not already connected
   try {
     if (getDatabaseHealth().status !== "connected") {
       await connectDB();
@@ -144,8 +153,8 @@ app.get("/api/health", async (req, res) => {
   });
 });
 
+// ─── DB Health Check ──────────────────────────────────────────────────────────
 app.get("/api/health/db", async (req, res) => {
-  // Trigger connection attempt if not already connected
   try {
     if (getDatabaseHealth().status !== "connected") {
       await connectDB();
@@ -161,6 +170,7 @@ app.get("/api/health/db", async (req, res) => {
   res.status(statusCode).json(db);
 });
 
+// ─── Swagger JSON ─────────────────────────────────────────────────────────────
 app.get("/api/docs.json", (req, res) => {
   if (!openApiDocument) {
     logger.error("OpenAPI document not found on /api/docs.json");
@@ -176,6 +186,7 @@ app.get("/api/docs.json", (req, res) => {
   return res.json(openApiDocument);
 });
 
+// ─── Swagger UI ───────────────────────────────────────────────────────────────
 if (openApiDocument) {
   const swaggerUiOptions = {
     customSiteTitle: "NGO Management System API Docs",
@@ -197,6 +208,7 @@ if (openApiDocument) {
   });
 }
 
+// ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/donations", donationRoutes);
@@ -204,6 +216,8 @@ app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/volunteers", volunteerRoutes);
 app.use("/api/beneficiaries", beneficiaryRoutes);
+
+// ─── Report Routes ────────────────────────────────────────────────────────────
 app.get("/api/reports/donations-summary", getDonationsSummary);
 app.get("/api/reports/projects", getProjectsReport);
 app.get("/api/reports/transparency", getTransparencyReport);
